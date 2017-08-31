@@ -1,0 +1,34 @@
+{
+  "name": "taskkit-svg-sprite",
+  "version": "1.0.0",
+  "description": "taskkit task for concatenating files",
+  "main": "scripts.js",
+  "scripts": {
+    "test": "tape test/test.*.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/firstandthird/taskkit-svg-sprite.git"
+  },
+  "author": "First+Third",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/firstandthird/taskkit-svg-sprite/issues"
+  },
+  "homepage": "https://github.com/firstandthird/taskkit-svg-sprite#readme",
+  "dependencies": {
+    "async": "^2.4.0",
+    "svg-sprite": "^1.3.7",
+    "taskkit-task": "^1.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.5.0",
+    "eslint-config-firstandthird": "3.2.0",
+    "eslint-plugin-import": "^2.7.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.8.0"
+  },
+  "eslintConfig": {
+    "extends": "firstandthird"
+  }
+}
