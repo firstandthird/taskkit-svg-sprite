@@ -17,6 +17,7 @@ class SVGSpriteTask extends TaskKitTask {
 
     const config = {
       shape: {
+        transform: [],
         id: {
           generator: function(n, file) {
             return path.basename(file.path, '.svg');
