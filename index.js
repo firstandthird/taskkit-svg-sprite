@@ -62,38 +62,5 @@ class SVGSpriteTask extends TaskKitTask {
     });
   }
 }
+
 module.exports = SVGSpriteTask;
-
-/*
-'use strict';
-
-const SVGSpriter = require('svg-sprite');
-const path = require('path');
-const fs = require('fs');
-const config = {
-  dest: 'web/public/_dist/',
-  mode: {
-    symbol: {
-      inline: true
-    }
-  }
-};
-const spriter = new SVGSpriter(config);
-const source = 'web/public/images/icons';
-
-fs.readdir(source, (err, data) => {
-  if (err) {
-    throw new Error(err);
-  }
-
-  data.filter(f => path.extname(f).toLowerCase() === '.svg')
-    .forEach(fileName => {
-      const filePath = path.resolve(source, fileName);
-      spriter.add(filePath, null, fs.readFileSync(filePath, { encoding: 'utf-8' }));
-    });
-
-  spriter.compile((error, result) => {
-    fs.writeFileSync(`${config.dest}sprite.symbol.svg`, result.symbol.sprite.contents);
-  });
-});
-*/
