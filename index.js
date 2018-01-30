@@ -4,6 +4,7 @@ const SVGSpriter = require('svg-sprite');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const glob = require('glob');
 
 class SVGSpriteTask extends TaskKitTask {
   get description() {
@@ -11,17 +12,11 @@ class SVGSpriteTask extends TaskKitTask {
   }
 
   process(input, filename, done) {
-    if (!Array.isArray(input)) {
-      input = [input];
-    }
-
     const config = {
       shape: {
         transform: [],
         id: {
-          generator: function(n, file) {
-            return path.basename(file.path, '.svg');
-          }
+          generator: (n, file) => path.basename(file.path, '.svg')
         }
       },
       mode: {
@@ -35,8 +30,11 @@ class SVGSpriteTask extends TaskKitTask {
     let shapes = 0;
 
     async.autoInject({
-      files(next) {
-        async.map(input, (file, done) => fs.readFile(file, 'utf8', (err, result) => {
+      inputs(next) {
+        glob(input, next);
+      },
+      files(inputs, next) {
+        async.map(inputs, (file, done) => fs.readFile(file, 'utf8', (err, result) => {
           if (err) {
             return done(err);
           }
@@ -47,8 +45,9 @@ class SVGSpriteTask extends TaskKitTask {
         try {
           files.forEach(file => spriter.add(file.file, null, file.result));
           shapes = files.length;
-        } catch(e) {
+        } catch (e) {
           next(e, null);
+          return;
         }
 
         spriter.compile(next);

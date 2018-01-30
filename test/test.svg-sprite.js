@@ -16,15 +16,12 @@ test('spits svg sprite files', (t) => {
 
   const file = `sprite.symbol-${new Date().getTime()}.svg`;
   const outpath = `${os.tmpdir()}/${file}`;
-  const files = {};
-  files[file] = {
-    input: ['test/fixtures/one.svg', 'test/fixtures/two.svg', 'test/fixtures/three.svg']
-  };
 
   const task = new SVGSpriteTask('sprite', {
-    dist: os.tmpdir(),
-    files
-  }, {});
+    files: {
+      [outpath]: 'test/fixtures/*.svg'
+    }
+  });
 
   task.execute((err) => {
     t.equal(err, null, 'not erroring');
