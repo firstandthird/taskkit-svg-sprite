@@ -15,7 +15,15 @@ class SVGSpriteTask extends TaskKitTask {
       input = [input];
     }
 
-    const spriter = svgstore();
+    const options = {
+      svgAttrs: {
+        width: 0,
+        height: 0,
+        style: 'position:absolute;'
+      }
+    };
+
+    const spriter = svgstore(options);
 
     async.autoInject({
       files(next) {
