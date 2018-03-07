@@ -1,6 +1,6 @@
 'use strict';
 const TaskKitTask = require('taskkit-task');
-const SVGSpriter = require('svg-sprite');
+const svgstore = require('svgstore');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
@@ -15,24 +15,15 @@ class SVGSpriteTask extends TaskKitTask {
       input = [input];
     }
 
-    const config = {
-      shape: {
-        transform: [],
-        id: {
-          generator: function(n, file) {
-            return path.basename(file.path, '.svg');
-          }
-        }
-      },
-      mode: {
-        symbol: {
-          inline: true
-        }
+    const options = {
+      svgAttrs: {
+        width: 0,
+        height: 0,
+        style: 'position:absolute;'
       }
     };
 
-    const spriter = new SVGSpriter(config);
-    let shapes = 0;
+    const spriter = svgstore(options);
 
     async.autoInject({
       files(next) {
@@ -45,21 +36,19 @@ class SVGSpriteTask extends TaskKitTask {
       },
       sprite(files, next) {
         try {
-          files.forEach(file => spriter.add(file.file, null, file.result));
-          shapes = files.length;
-        } catch(e) {
-          next(e, null);
+          files.forEach(file => spriter.add(path.basename(file.file, '.svg'), file.result));
+        } catch (e) {
+          return next(e, null);
         }
 
-        spriter.compile(next);
+        next(null, spriter);
       }
     }, (err, results) => {
       if (err) {
         return done(err);
       }
-      const contents = results.sprite[0].symbol.sprite.contents;
 
-      this.write(filename, contents.toString('utf8'), done);
+      this.write(filename, results.sprite.toString({ inline: true }), done);
     });
   }
 }
