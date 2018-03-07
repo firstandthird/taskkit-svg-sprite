@@ -1,9 +1,58 @@
 'use strict';
 const TaskKitTask = require('taskkit-task');
-const svgstore = require('svgstore');
+const SVGSpriter = require('svg-sprite');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const DOMParser = require('xmldom').DOMParser;
+
+const defs = new DOMParser().parseFromString('<defs></defs>');
+let count = 0;
+
+/**
+ * Fixes Firefox defs issue: https://github.com/jkphl/svg-sprite/issues/74
+ */
+function regexEscape(str) {
+  return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function updateUrls(svg, idsToReplace) {
+  for (let i = 0; i < idsToReplace.length; i++) {
+    const str = `url(#${idsToReplace[i][0]})`;
+    svg = svg.replace(
+      new RegExp(regexEscape(str), 'g'),
+      `url(#${idsToReplace[i][1]})`
+    );
+  }
+
+  return svg;
+}
+
+function extractGradients(shape, tag) {
+  const idsToReplace = [];
+
+  const gradients = shape.dom.getElementsByTagName(tag);
+  while (gradients.length > 0) {
+    defs.documentElement.appendChild(gradients[0]);
+
+    const id = gradients[0].getAttribute('id');
+    const newId = `g${++count}`;
+    gradients[0].setAttribute('id', newId);
+    idsToReplace.push([id, newId]);
+  }
+
+  return idsToReplace;
+}
+
+function gradientsExtraction(shape, spriter, callback) {
+  const idsToReplace = [].concat(
+    extractGradients(shape, 'linearGradient'),
+    extractGradients(shape, 'radialGradient')
+  );
+
+  shape.setSVG(updateUrls(shape.getSVG(), idsToReplace));
+  callback(null);
+}
 
 class SVGSpriteTask extends TaskKitTask {
   get description() {
@@ -15,15 +64,33 @@ class SVGSpriteTask extends TaskKitTask {
       input = [input];
     }
 
-    const options = {
-      svgAttrs: {
-        width: 0,
-        height: 0,
-        style: 'position:absolute;'
+    const config = {
+      shape: {
+        transform: [
+          gradientsExtraction,
+          'svgo',
+        ],
+        id: {
+          generator: (n, file) => path.basename(file.path, '.svg')
+        }
+      },
+      mode: {
+        symbol: {
+          inline: true
+        }
+      },
+      svg: {
+        transform: [
+          svg => svg.replace(
+            '<symbol ',
+            `${defs.firstChild.toString()}<symbol `
+          )
+        ],
       }
     };
 
-    const spriter = svgstore(options);
+    const spriter = new SVGSpriter(config);
+    let shapes = 0;
 
     async.autoInject({
       files(next) {
@@ -36,19 +103,21 @@ class SVGSpriteTask extends TaskKitTask {
       },
       sprite(files, next) {
         try {
-          files.forEach(file => spriter.add(path.basename(file.file, '.svg'), file.result));
+          files.forEach(file => spriter.add(file.file, null, file.result));
+          shapes = files.length;
         } catch (e) {
-          return next(e, null);
+          next(e, null);
         }
 
-        next(null, spriter);
+        spriter.compile(next);
       }
     }, (err, results) => {
       if (err) {
         return done(err);
       }
+      const contents = results.sprite[0].symbol.sprite.contents;
 
-      this.write(filename, results.sprite.toString({ inline: true }), done);
+      this.write(filename, contents.toString('utf8'), done);
     });
   }
 }
