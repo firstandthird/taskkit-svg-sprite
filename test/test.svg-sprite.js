@@ -30,6 +30,7 @@ test('spits svg sprite files', (t) => {
 
   const task = new SVGSpriteTask('sprite', {
     dist: os.tmpdir(),
+    disableSVGO: true,
     files
   }, {});
 

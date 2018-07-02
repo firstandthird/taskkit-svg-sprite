@@ -59,6 +59,12 @@ class SVGSpriteTask extends TaskKitTask {
     return 'Creates an SVG sprite file';
   }
 
+  get defaultOptions() {
+    return {
+      disableSVGO: false
+    };
+  }
+
   process(input, filename, done) {
     if (!Array.isArray(input)) {
       input = [input];
@@ -87,6 +93,10 @@ class SVGSpriteTask extends TaskKitTask {
         ],
       }
     };
+
+    if (!this.options.disableSVGO) {
+      config.shape.transform.push('svgo');
+    }
 
     const spriter = new SVGSpriter(config);
     let shapes = 0;
