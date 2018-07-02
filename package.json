@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/firstandthird/taskkit-svg-sprite#readme",
   "dependencies": {
-    "async": "^2.4.0",
-    "svg-sprite": "^1.3.7",
+    "async": "^2.6.1",
+    "svg-sprite": "^1.4.0",
     "taskkit-task": "^1.0.2",
     "xmldom": "^0.1.27"
   },

@@ -67,8 +67,7 @@ class SVGSpriteTask extends TaskKitTask {
     const config = {
       shape: {
         transform: [
-          gradientsExtraction,
-          'svgo',
+          gradientsExtraction
         ],
         id: {
           generator: (n, file) => path.basename(file.path, '.svg')
@@ -94,11 +93,12 @@ class SVGSpriteTask extends TaskKitTask {
 
     async.autoInject({
       files(next) {
-        async.map(input, (file, done) => fs.readFile(file, 'utf8', (err, result) => {
+        async.map(input, (file, cb) => fs.readFile(file, 'utf8', (err, result) => {
           if (err) {
-            return done(err);
+            return cb(err);
           }
-          done(null, { file, result });
+
+          cb(null, { file, result });
         }), next);
       },
       sprite(files, next) {

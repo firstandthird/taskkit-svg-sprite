@@ -18,7 +18,14 @@ test('spits svg sprite files', (t) => {
   const outpath = `${os.tmpdir()}/${file}`;
   const files = {};
   files[file] = {
-    input: ['test/fixtures/one.svg', 'test/fixtures/two.svg', 'test/fixtures/three.svg', 'test/fixtures/four.svg', 'test/fixtures/five.svg']
+    input: [
+      'test/fixtures/one.svg',
+      'test/fixtures/two.svg',
+      'test/fixtures/three.svg',
+      'test/fixtures/four.svg',
+      'test/fixtures/five.svg',
+      'test/fixtures/six.svg'
+    ]
   };
 
   const task = new SVGSpriteTask('sprite', {
