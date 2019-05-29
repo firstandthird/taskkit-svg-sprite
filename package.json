@@ -17,17 +17,17 @@
   },
   "homepage": "https://github.com/firstandthird/taskkit-svg-sprite#readme",
   "dependencies": {
-    "async": "^2.6.1",
-    "svg-sprite": "^1.4.0",
-    "taskkit-task": "^1.0.2",
+    "async": "^3.0.1",
+    "svg-sprite": "^1.5.0",
+    "taskkit-task": "^2.1.0",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
-    "eslint": "^4.5.0",
-    "eslint-config-firstandthird": "3.2.0",
-    "eslint-plugin-import": "^2.7.0",
-    "tap-spec": "^4.1.1",
-    "tape": "^4.8.0"
+    "eslint": "^5.16.0",
+    "eslint-config-firstandthird": "4.3.0",
+    "eslint-plugin-import": "^2.17.3",
+    "tap-spec": "^5.0.0",
+    "tape": "^4.10.2"
   },
   "eslintConfig": {
     "extends": "firstandthird"

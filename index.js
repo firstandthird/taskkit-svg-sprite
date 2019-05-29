@@ -59,13 +59,17 @@ class SVGSpriteTask extends TaskKitTask {
     return 'Creates an SVG sprite file';
   }
 
+  get classModule() {
+    return path.join(__dirname, 'index.js');
+  }
+
   get defaultOptions() {
     return {
       disableSVGO: false
     };
   }
 
-  process(input, filename, done) {
+  process(input, filename) {
     if (!Array.isArray(input)) {
       input = [input];
     }
@@ -99,9 +103,8 @@ class SVGSpriteTask extends TaskKitTask {
     }
 
     const spriter = new SVGSpriter(config);
-    let shapes = 0;
 
-    async.autoInject({
+    return async.autoInject({
       files(next) {
         async.map(input, (file, cb) => fs.readFile(file, 'utf8', (err, result) => {
           if (err) {
@@ -114,20 +117,15 @@ class SVGSpriteTask extends TaskKitTask {
       sprite(files, next) {
         try {
           files.forEach(file => spriter.add(file.file, null, file.result));
-          shapes = files.length;
         } catch (e) {
-          next(e, null);
+          return next(e, null);
         }
 
         spriter.compile(next);
       }
-    }, (err, results) => {
-      if (err) {
-        return done(err);
-      }
+    }).then(results => {
       const contents = results.sprite[0].symbol.sprite.contents;
-
-      this.write(filename, contents.toString('utf8'), done);
+      return this.write(filename, contents.toString('utf8'));
     });
   }
 }

@@ -11,8 +11,8 @@ test('instance of', assert => {
   assert.end();
 });
 
-test('spits svg sprite files', (t) => {
-  t.plan(3);
+test('spits svg sprite files', async (t) => {
+  t.plan(2);
 
   const file = `sprite.symbol-${new Date().getTime()}.svg`;
   const outpath = `${os.tmpdir()}/${file}`;
@@ -34,9 +34,7 @@ test('spits svg sprite files', (t) => {
     files
   }, {});
 
-  task.execute((err) => {
-    t.equal(err, null, 'not erroring');
-    t.equal(fs.existsSync(outpath), true, 'file exists');
-    t.equal(fs.readFileSync(outpath, 'utf8'), fs.readFileSync('test/expected/output.svg', 'utf8'));
-  });
+  await task.execute();
+  t.equal(fs.existsSync(outpath), true, 'file exists');
+  t.equal(fs.readFileSync(outpath, 'utf8'), fs.readFileSync('test/expected/output.svg', 'utf8'));
 });
