@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const DOMParser = require('xmldom').DOMParser;
 
-const defs = new DOMParser().parseFromString('<defs></defs>');
+let defs = new DOMParser().parseFromString('<defs></defs>');
 let count = 0;
 
 /**
@@ -90,12 +90,23 @@ class SVGSpriteTask extends TaskKitTask {
       },
       svg: {
         transform: [
-          svg => svg.replace(
-            '<symbol ',
-            `${defs.firstChild.toString()}<symbol `
-          ).replace(
-            '<svg',
-            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"')
+          svg => {
+            const defsString = defs.firstChild.toString();
+            let string = svg;
+
+            if (defsString !== '<defs/>') {
+              string = string.replace(
+                '<symbol ',
+                `${defsString}<symbol `
+              );
+            }
+
+            string = string.replace(
+              '<svg',
+              '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"');
+
+            return string;
+          }
         ],
       }
     };
@@ -124,6 +135,12 @@ class SVGSpriteTask extends TaskKitTask {
         }
 
         spriter.compile(next);
+      },
+      reset(sprite, next) {
+        defs = new DOMParser().parseFromString('<defs></defs>');
+        count = 0;
+
+        next();
       }
     }).then(results => {
       const contents = results.sprite[0].symbol.sprite.contents;
